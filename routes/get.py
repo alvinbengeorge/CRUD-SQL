@@ -3,8 +3,8 @@ from fastapi.routing import APIRouter as Router
 from utilities.database import Database
 
 router = Router()
+db = Database()
 
 @router.get("/get")
 async def get_all():
-    db = Database()
     return db.show_all()
