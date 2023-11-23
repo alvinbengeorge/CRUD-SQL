@@ -1,2 +1,2 @@
 # CRUD-SQL
-Just gonna test some SQL in Python and TypeScript
+Just gonna test some SQL in Python here
