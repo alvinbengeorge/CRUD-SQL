@@ -27,9 +27,7 @@ class Database:
         result = []
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT * FROM log")
-            result = cursor.fetchall()
-        for i in range(len(result)):
-            result[i] = self.convert_to_dict(result[i])
+            result = [self.convert_to_dict(i) for i in cursor.fetchall()]
         return result
         
     def show_first(self, num: int) -> List[tuple]:
@@ -37,7 +35,7 @@ class Database:
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT * FROM log LIMIT %s", (num,))
             result = cursor.fetchall()
-        return self.convert_to_dict(result)
+        return [self.convert_to_dict(i) for i in result]
     
     def insert(self, data: LogData) -> None:
         with self.connection.cursor() as cursor:
@@ -54,16 +52,21 @@ class Database:
     
     def update(self, id: int, new_data: LogData) -> None:
         with self.connection.cursor() as cursor:
-            cursor.execute("UPDATE log SET user = %s, time = %s, description = %s WHERE id = %s", (new_data.user, new_data.time, new_data.description, id))
+            cursor.execute("UPDATE log SET user = %s, time = %s, description = %s WHERE id = %s", (new_data.user, str(int(time())), new_data.description, id))
             self.connection.commit()
 
     def show_by_id(self, id: int) -> tuple:
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT * FROM log WHERE id = %s", (id,))
-            return cursor.fetchone()
+            return self.convert_to_dict(cursor.fetchone())
         
     def search(self, query: str) -> List[tuple]:
         with self.connection.cursor() as cursor:
             cursor.execute(f"SELECT * FROM log WHERE description LIKE \%{query}\%")
-            return self.convert_to_dict(cursor.fetchall())
+            return [self.convert_to_dict(i) for i in cursor.fetchall()]
+        
+    def clear(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("DELETE FROM log")
+            self.connection.commit()
         
