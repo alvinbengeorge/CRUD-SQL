@@ -14,6 +14,9 @@ connection = mysql.connect(
 class Database:
     def __init__(self):
         self.connection = connection
+        with self.connection.cursor() as cursor:
+            cursor.execute("CREATE TABLE IF NOT EXISTS log (user VARCHAR(255), time VARCHAR(255), description VARCHAR(255), id INT PRIMARY KEY)")
+            self.connection.commit()
 
     def convert_to_dict(self, data: tuple) -> dict:
         return {
